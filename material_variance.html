@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Material Variance Calculator</title>
+    <style>
+      /* General Styles */
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f4f7fa;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* Navigation Bar */
+      header {
+        background-color: #3498db;
+        padding: 10px 0;
+        text-align: center;
+        background-image: url("stock-market.jpg");
+      }
+      nav {
+        margin: 0 auto;
+        padding: 10px 0;
+      }
+      nav a {
+        margin: 0 15px;
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      nav a:hover {
+        text-decoration: underline;
+      }
+      h1 {
+        color: #ffffff;
+        margin-bottom: 10px;
+      }
+      /* Container for Form and Results */
+      .container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 20px;
+        background-color: white;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+      }
+
+      /* Input Styling */
+      select,
+      input {
+        width: 100%;
+        padding: 12px 15px;
+        margin: 10px 0 20px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        box-sizing: border-box;
+        font-size: 16px;
+      }
+
+      input:focus,
+      select:focus {
+        border-color: #9dd4f3;
+        outline: none;
+      }
+
+      /* Table Styling */
+      .table-input {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 30px;
+      }
+      .table-input th,
+      .table-input td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #f0f0f0;
+      }
+      .table-input th {
+        background-color: #f9f9f9;
+      }
+      .table-input tr:hover {
+        background-color: #f1f1f1;
+      }
+
+      /* Button Styling */
+      .btn,
+      .download-btn {
+        background-color: #9dd4f3;
+        color: white;
+        padding: 14px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+      }
+
+      .btn:hover,
+      .download-btn:hover {
+        background-color: #9dd4f3;
+      }
+
+      /* Results Section */
+      .result-container {
+        background-color: #e6f7ff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        display: none;
+      }
+
+      h3 {
+        font-size: 20px;
+        margin-bottom: 15px;
+      }
+
+      .result-text {
+        font-size: 16px;
+        margin-bottom: 10px;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .container {
+          padding: 15px;
+        }
+
+        .table-input th,
+        .table-input td {
+          padding: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Material Variance Analysis</h1>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="labor_variance.html">Labor Variance</a>
+        <a href="material_variance.html">Material Variance</a>
+      </nav>
+    </header>
+
+    <div class="container">
+      <label for="num-materials"
+        >Select the number of materials used in production:</label
+      >
+      <select id="num-materials" onchange="showMaterialInputs()">
+        <option value="1">1 Material</option>
+        <option value="2">2 Materials</option>
+        <option value="3">3 Materials</option>
+        <option value="4">4 Materials</option>
+      </select>
+
+      <div id="materials-inputs">
+        <table class="table-input">
+          <tr>
+            <th>Material</th>
+            <th>Standard Price</th>
+            <th>Standard Quantity</th>
+            <th>Actual Price</th>
+            <th>Actual Quantity</th>
+          </tr>
+          <tr>
+            <td>Material 1</td>
+            <td><input type="number" id="sp1" /></td>
+            <td><input type="number" id="sq1" /></td>
+            <td><input type="number" id="ap1" /></td>
+            <td><input type="number" id="aq1" /></td>
+          </tr>
+        </table>
+      </div>
+
+      <button class="btn" onclick="calculateVariances()">Calculate</button>
+    </div>
+
+    <div class="container result-container" id="result-container">
+      <h3>Calculated Material Variances:</h3>
+      <div class="result-text" id="price-variance"></div>
+      <div class="result-text" id="usage-variance"></div>
+      <div class="result-text" id="mix-variance"></div>
+      <div class="result-text" id="yield-variance"></div>
+      <br />
+      <button class="download-btn" onclick="downloadReport()">
+        Download Report
+      </button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+   <script>
+    // Declare global variables to store the variances
+    let globalPriceVariance = 0;
+    let globalUsageVariance = 0;
+    let globalMixVariance = 0;
+    let globalYieldVariance = 0;
+
+    function calculateVariances() {
+        const numMaterials = document.getElementById('num-materials').value;
+        let totalPriceVariance = 0;
+        let totalUsageVariance = 0;
+        let totalMixVariance = 0;
+        let totalYieldVariance = 0;
+
+        let resultText = '';
+
+        for (let i = 1; i <= numMaterials; i++) {
+            const sp = parseFloat(document.getElementById(`sp${i}`).value);
+            const sq = parseFloat(document.getElementById(`sq${i}`).value);
+            const ap = parseFloat(document.getElementById(`ap${i}`).value);
+            const aq = parseFloat(document.getElementById(`aq${i}`).value);
+
+            // Price Variance Calculation
+            const priceVariance = (sp - ap) * aq;
+            totalPriceVariance += priceVariance;
+            resultText += `Price Variance for Material ${i}: ${priceVariance.toFixed(2)} Rs. ${(priceVariance < 0 ? '(F)' : '(A)')}<br>`;
+
+            // Usage Variance Calculation
+            const usageVariance = (sq - aq) * sp;
+            totalUsageVariance += usageVariance;
+            resultText += `Usage Variance for Material ${i}: ${usageVariance.toFixed(2)} Rs. ${(usageVariance < 0 ? '(F)' : '(A)')}<br>`;
+
+            // Mix Variance Calculation (Standard Qty - Actual Qty) * Standard Price
+            const mixVariance = (sq - aq) * sp;
+            totalMixVariance += mixVariance;
+            resultText += `Mix Variance for Material ${i}: ${mixVariance.toFixed(2)} Rs. ${(mixVariance < 0 ? '(F)' : '(A)')}<br>`;
+
+            // Yield Variance Calculation
+            const yieldVariance = (sq - aq) * sp;
+            totalYieldVariance += yieldVariance;
+            resultText += `Yield Variance for Material ${i}: ${yieldVariance.toFixed(2)} Rs. ${(yieldVariance < 0 ? '(F)' : '(A)')}<br><br>`;
+        }
+
+        // Store the totals in global variables
+        globalPriceVariance = totalPriceVariance.toFixed(2);
+        globalUsageVariance = totalUsageVariance.toFixed(2);
+        globalMixVariance = totalMixVariance.toFixed(2);
+        globalYieldVariance = totalYieldVariance.toFixed(2);
+
+        // Total Variances
+        resultText += `
+            <b>Total Price Variance: ${globalPriceVariance} Rs. ${(totalPriceVariance < 0 ? '(F)' : '(A)')}</b><br>
+            <b>Total Usage Variance: ${globalUsageVariance} Rs. ${(totalUsageVariance < 0 ? '(F)' : '(A)')}</b><br>
+            <b>Total Mix Variance: ${globalMixVariance} Rs. ${(totalMixVariance < 0 ? '(F)' : '(A)')}</b><br>
+            <b>Total Yield Variance: ${globalYieldVariance} Rs. ${(totalYieldVariance < 0 ? '(F)' : '(A)')}</b><br>
+        `;
+
+        document.getElementById('result-container').style.display = 'block';
+        document.getElementById('price-variance').innerHTML = resultText;
+    }
+
+    function downloadReport() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Set Title
+        doc.setFontSize(18);
+        doc.text('Material Variance Report', 20, 20);
+
+        // Add the variances to the PDF
+        doc.setFontSize(12);
+        doc.text(`Total Price Variance: ${globalPriceVariance} Rs.`, 20, 40);
+        doc.text(`Total Usage Variance: ${globalUsageVariance} Rs.`, 20, 50);
+        doc.text(`Total Mix Variance: ${globalMixVariance} Rs.`, 20, 60);
+        doc.text(`Total Yield Variance: ${globalYieldVariance} Rs.`, 20, 70);
+
+        // Save the PDF
+        doc.save('Material_Variance_Report.pdf');
+    }
+</script>
+
+  </body>
+</html>

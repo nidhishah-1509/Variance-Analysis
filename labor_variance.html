@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Labor Variance Calculator</title>
+    <style>
+      /* General Styles */
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f4f7fa;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* Navigation Bar */
+      header {
+        background-color: #3498db;
+        padding: 10px 0;
+        text-align: center;
+        background-image: url("stock-market.jpg");
+      }
+      nav {
+        margin: 0 auto;
+        padding: 10px 0;
+      }
+      nav a {
+        margin: 0 15px;
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      h1 {
+        color: #ffffff;
+        margin-bottom: 10px;
+      }
+      nav a:hover {
+        text-decoration: underline;
+      }
+
+      /* Container for Form and Results */
+      .container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 20px;
+        background-color: white;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+      }
+
+      /* Input Styling */
+      select,
+      input {
+        width: 100%;
+        padding: 12px 15px;
+        margin: 10px 0 20px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        box-sizing: border-box;
+        font-size: 16px;
+      }
+
+      input:focus,
+      select:focus {
+        border-color: #9dd4f3;
+        outline: none;
+      }
+
+      /* Table Styling */
+      .table-input {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 30px;
+      }
+      .table-input th,
+      .table-input td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #f0f0f0;
+      }
+      .table-input th {
+        background-color: #f9f9f9;
+      }
+      .table-input tr:hover {
+        background-color: #f1f1f1;
+      }
+
+      /* Button Styling */
+      .btn,
+      .download-btn {
+        background-color: #9dd4f3;
+        color: white;
+        padding: 14px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+      }
+
+      .btn:hover,
+      .download-btn:hover {
+        background-color: #9dd4f3;
+      }
+
+      /* Results Section */
+      .result-container {
+        background-color: #e6f7ff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        display: none;
+      }
+
+      h3 {
+        font-size: 20px;
+        margin-bottom: 15px;
+      }
+
+      .result-text {
+        font-size: 16px;
+        margin-bottom: 10px;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .container {
+          padding: 15px;
+        }
+
+        .table-input th,
+        .table-input td {
+          padding: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Labor Variance Analysis</h1>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="labor_variance.html">Labor Variance</a>
+        <a href="material_variance.html">Material Variance</a>
+      </nav>
+    </header>
+
+    <div class="container">
+      <label for="num-labors">Select the labor types used in production:</label>
+      <select id="num-labors" onchange="showLaborInputs()">
+        <option value="1">Skilled Labor</option>
+        <option value="2">Skilled & Semi-skilled Labor</option>
+        <option value="3">Skilled, Semi-skilled & Unskilled Labor</option>
+      </select>
+
+      <div id="labor-inputs">
+        <table class="table-input">
+          <tr>
+            <th>Labor Type</th>
+            <th>Standard Rate per Hour</th>
+            <th>Standard Hours Worked</th>
+            <th>Actual Rate per Hour</th>
+            <th>Actual Hours Worked</th>
+            <th>Idle Time (if applicable)</th>
+          </tr>
+          <tr>
+            <td>Skilled</td>
+            <td><input type="number" id="sr-skilled" /></td>
+            <td><input type="number" id="sh-skilled" /></td>
+            <td><input type="number" id="ar-skilled" /></td>
+            <td><input type="number" id="ah-skilled" /></td>
+            <td><input type="number" id="idle-skilled" /></td>
+          </tr>
+        </table>
+      </div>
+
+      <button class="btn" onclick="calculateLaborVariances()">Calculate</button>
+    </div>
+
+    <div class="container result-container" id="result-container">
+      <h3>Calculated Labor Variances:</h3>
+      <div class="result-text" id="rate-variance"></div>
+      <div class="result-text" id="cost-variance"></div>
+      <div class="result-text" id="efficiency-variance"></div>
+      <div class="result-text" id="idle-variance"></div>
+      <div class="result-text" id="mix-variance"></div>
+      <br />
+      <button class="download-btn" onclick="downloadLaborReport()">
+        Download Report
+      </button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+      function showLaborInputs() {
+        const numLabors = document.getElementById("num-labors").value;
+        let tableContent = "";
+
+        if (numLabors >= 1) {
+          tableContent += `<tr>
+                        <td>Skilled</td>
+                        <td><input type="number" id="sr-skilled" /></td>
+                        <td><input type="number" id="sh-skilled" /></td>
+                        <td><input type="number" id="ar-skilled" /></td>
+                        <td><input type="number" id="ah-skilled" /></td>
+                        <td><input type="number" id="idle-skilled" /></td>
+                    </tr>`;
+        }
+
+        if (numLabors >= 2) {
+          tableContent += `<tr>
+                        <td>Semi-skilled</td>
+                        <td><input type="number" id="sr-semi" /></td>
+                        <td><input type="number" id="sh-semi" /></td>
+                        <td><input type="number" id="ar-semi" /></td>
+                        <td><input type="number" id="ah-semi" /></td>
+                        <td><input type="number" id="idle-semi" /></td>
+                    </tr>`;
+        }
+
+        if (numLabors === "3") {
+          tableContent += `<tr>
+                        <td>Unskilled</td>
+                        <td><input type="number" id="sr-unskilled" /></td>
+                        <td><input type="number" id="sh-unskilled" /></td>
+                        <td><input type="number" id="ar-unskilled" /></td>
+                        <td><input type="number" id="ah-unskilled" /></td>
+                        <td><input type="number" id="idle-unskilled" /></td>
+                    </tr>`;
+        }
+
+        document.getElementById(
+          "labor-inputs"
+        ).innerHTML = `<table class="table-input">
+                    <tr>
+                        <th>Labor Type</th>
+                        <th>Standard Rate per Hour</th>
+                        <th>Standard Hours Worked</th>
+                        <th>Actual Rate per Hour</th>
+                        <th>Actual Hours Worked</th>
+                        <th>Idle Time (if applicable)</th>
+                    </tr>
+                    ${tableContent}
+                </table>`;
+      }
+
+      function calculateLaborVariances() {
+        const numLabors = document.getElementById("num-labors").value;
+        let rateVariance = 0;
+        let costVariance = 0;
+        let efficiencyVariance = 0;
+        let idleVariance = 0;
+        let mixVariance = 0;
+        let resultText = "";
+
+        // Skilled Labor Variance Calculation
+        if (numLabors >= 1) {
+          const srSkilled = parseFloat(
+            document.getElementById("sr-skilled").value
+          );
+          const shSkilled = parseFloat(
+            document.getElementById("sh-skilled").value
+          );
+          const arSkilled = parseFloat(
+            document.getElementById("ar-skilled").value
+          );
+          const ahSkilled = parseFloat(
+            document.getElementById("ah-skilled").value
+          );
+          const idleSkilled = parseFloat(
+            document.getElementById("idle-skilled").value
+          );
+
+          const rateVarianceSkilled = (arSkilled - srSkilled) * ahSkilled;
+          const costVarianceSkilled = (arSkilled - srSkilled) * shSkilled;
+          const efficiencyVarianceSkilled = (shSkilled - ahSkilled) * srSkilled;
+
+          // Idle Time Variance
+          const idleTimeVarianceSkilled = idleSkilled * srSkilled;
+
+          resultText += `
+                    <p><strong>Skilled Labor:</strong></p>
+                    <p>Rate Variance: ${rateVarianceSkilled.toFixed(2)}</p>
+                    <p>Cost Variance: ${costVarianceSkilled.toFixed(2)}</p>
+                    <p>Efficiency Variance: ${efficiencyVarianceSkilled.toFixed(
+                      2
+                    )}</p>
+                    <p>Idle Time Variance: ${idleTimeVarianceSkilled.toFixed(
+                      2
+                    )}</p>
+                `;
+        }
+
+        // Further calculations for Semi-skilled and Unskilled labor can follow a similar pattern here.
+
+        document.getElementById("rate-variance").innerHTML = resultText;
+        document.getElementById("result-container").style.display = "block";
+      }
+
+      function downloadLaborReport() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        doc.setFontSize(18);
+        doc.text("Labor Variance Report", 20, 20);
+
+        doc.setFontSize(12);
+        doc.text("Calculated Labor Variances:", 20, 40);
+        doc.text(document.getElementById("rate-variance").innerText, 20, 50);
+        doc.save("labor_variance_report.pdf");
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home - Variance Analysis Tool</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Roboto", sans-serif;
+        margin: 0;
+        background-color: #ffffff; /* Light background */
+        color: #333;
+      }
+      header {
+        background-color: #3498db;
+        padding: 10px 0;
+        text-align: center;
+        background-image: url("stock-market.jpg");
+      }
+      nav {
+        margin: 0 auto;
+        padding: 10px 0;
+      }
+      nav a {
+        margin: 0 15px;
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      nav a:hover {
+        text-decoration: underline;
+      }
+      h1 {
+        color: #ffffff;
+        margin-bottom: 10px;
+      }
+      h2 {
+        margin-top: 20px;
+        color: #2980b9;
+      }
+      p,
+      li {
+        line-height: 1.6;
+        font-size:15px;
+      }
+      .content {
+        padding: 20px;
+        max-width: 100%;
+        margin: 0 auto;
+        border-radius: 8px;
+      }
+      footer {
+        text-align: center;
+        padding: 20px;
+        font-size: 0.9em;
+        color: #7f8c8d;
+      }
+      /* Bento grid styling */
+      .bento-box {
+        display: grid;
+        grid-template-columns: repeat(
+          auto-fill,
+          minmax(15vw, 1fr)
+        ); 
+        gap: 20px;
+        margin-top: 20px;
+        position: relative; /* Positioning context for the pseudo-element */
+        padding: 20px;
+        border-radius: 8px;
+        /*box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);*/
+      }
+
+      .bento-box::before {
+        content: ""; /* Required for the pseudo-element */
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ffffff;
+        background-size: cover;
+        background-position: center;
+        opacity: 0.4; /* Adjust the opacity here */
+        border-radius: 8px;
+        z-index: -1; /* Place the image behind the content */
+      }
+
+      .bento-box .box {
+        background-color: rgba(
+          255,
+          255,
+          255,
+          0.454
+        ); /* White box with slight transparency */
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      .bento-box .box h3 {
+        margin-top: 0;
+      }
+      .box p{
+      font-size: 13px;
+      }
+
+      /* Media query for smaller screens */
+      @media (max-width: 1200px) {
+        .bento-box {
+          grid-template-columns: repeat(
+            3,
+            1fr
+          ); /* 3 columns for medium screens */
+        }
+      }
+
+      @media (max-width: 800px) {
+        .bento-box {
+          grid-template-columns: repeat(
+            2,
+            1fr
+          ); /* 2 columns for small screens */
+        }
+      }
+
+      @media (max-width: 600px) {
+        .bento-box {
+          grid-template-columns: 1fr; /* Single column for very small screens */
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Variance Analysis Tool</h1>
+      <nav>
+        <a href="index.html">Home</a>
+        <a href="labor_variance.html">Labor Variance</a>
+        <a href="material_variance.html">Material Variance</a>
+      </nav>
+    </header>
+
+    <div class="content">
+      <h2>Understanding Standard Costing and Variance Analysis</h2>
+      <p>
+        Variance analysis helps businesses measure the difference between
+        expected and actual performance. This webpage allows users to calculate material variances and labour variances with a downloadable report option for detailed results. 
+        The tool helps companies analyse production performance, pinpoint inefficiencies, and identify areas for improvement. 
+        <br><b>To calculate the variances click on the link in the navbar</b>
+
+      </p>
+
+      <h2>Some Important Variances</h2>
+      <div class="bento-box">
+        <div class="box">
+          <h3>Material Price Variance</h3>
+          <p>
+            <strong>Formula:</strong> (Actual Price - Standard Price) x Actual
+            Quantity
+          </p>
+          <p>
+            <strong>Description:</strong> Measures the difference in cost
+            between what was paid for materials and what should have been paid
+            according to the standard.
+          </p>
+        </div>
+        <div class="box">
+          <h3>Material Quantity Variance</h3>
+          <p>
+            <strong>Formula:</strong> (Actual Quantity - Standard Quantity) x
+            Standard Price
+          </p>
+          <p>
+            <strong>Description:</strong> Indicates the difference between the
+            actual quantity of materials used and the standard quantity expected
+            to be used.
+          </p>
+        </div>
+        <div class="box">
+          <h3>Labor Rate Variance</h3>
+          <p>
+            <strong>Formula:</strong> (Actual Rate - Standard Rate) x Actual
+            Hours
+          </p>
+          <p>
+            <strong>Description:</strong> Reflects the difference between the
+            actual labor rate paid and the standard labor rate set by the
+            company.
+          </p>
+        </div>
+        <div class="box">
+          <h3>Labor Efficiency Variance</h3>
+          <p>
+            <strong>Formula:</strong> (Actual Hours - Standard Hours) x Standard
+            Rate
+          </p>
+          <p>
+            <strong>Description:</strong> Shows the difference between the
+            actual hours worked and the standard hours expected for the actual
+            output.
+          </p>
+        </div>
+        <div class="box">
+          <h3>Overhead Variance</h3>
+          <p><strong>Formula:</strong> Actual Overhead - Applied Overhead</p>
+          <p>
+            <strong>Description:</strong> Measures the difference between the
+            actual overhead costs incurred and the overhead applied based on
+            standard rates.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      &copy; 2024 Variance Analysis Tool. All rights reserved. Arpita Ishaa
+      Nidhi Pavarna Saanvi
+    </footer>
+  </body>
+</html>  
